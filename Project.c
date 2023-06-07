@@ -1,15 +1,17 @@
-#include<stdio.h>
-#include<string.h>
+#include <stdio.h>
+#include <string.h>
 
 typedef struct
 {
     char Name[50];
-    char Date[100];
+    char Date[20];
+    char DOB[20];
+    char Address[100];
     double voter_id;
 } Death_Record;
 
 int num_records = 0;
-Death_Record D[100];
+Death_Record D[1000];
 
 void Admin_panel();
 void Guest_panel();
@@ -26,7 +28,7 @@ int main()
     Load_Records();
 
     char admin;
-    printf("\t\t\tWelcome to our Graveyard Management System\n\n\n");
+    printf("\n\t\t\tWelcome to our Graveyard Management System\n\n\n");
     printf("\t\tAre you an Admin? If you are an Admin, press 'y'. Otherwise, press 'n': ");
     scanf(" %c", &admin);
     if (admin == 'y')
@@ -48,14 +50,19 @@ int main()
 
 void Admin_panel()
 {
-    int id, a;
-    int password;
-    printf("\n\t\tEnter your ID: ");
-    scanf("%d", &id);
+    char name[20];
+    char password[20];
+    int a;
+    char n[20] = "ravid";
+    char p[20] = "ravid123";
+    printf("\n\t\tEnter your Name: ");
+    scanf("%s", &name);
     printf("\n");
     printf("\t\tEnter password: ");
-    scanf("%d", &password);
-    if (id == 168 && password == 111)
+    scanf("%s", &password);
+    int r1 = strcmp(name,n);
+    int p1 = strcmp(password,p);
+    if ( r1==0 && p1==0)
     {
         printf("\n\t\tWelcome to Admin Panel\n\n");
         printf("\t\t1. View Death Records\n");
@@ -127,14 +134,14 @@ void View_Record()
         printf("\t\tNo Records to Display.\n");
         return;
     }
-    printf("\n\t\t------------------- Death Records -------------------\n\n");
-    printf("%-20s %-20s %-20s\n", "Name", "Date of Death", "Voter ID Number");
-    printf("-------------------------------------------------------\n");
+    printf("\n\t\t----------------------------------- Death Records --------------------------------------------\n\n");
+    printf("%-20s %-20s %-20s %-25s %-20s\n", "Name", "Date of Death", "Date of Birth", "Address", "Voter ID Number");
+    printf("---------------------------------------------------------------------------------------------------------\n");
     for (int i = 0; i < num_records; i++)
     {
-        printf("%-20s %-20s %-20lf\n", D[i].Name, D[i].Date, D[i].voter_id);
+        printf("%-20s %-20s %-20s %-25s %-20lf\n", D[i].Name, D[i].Date, D[i].DOB, D[i].Address, D[i].voter_id);
     }
-    printf("-------------------------------------------------------\n");
+    printf("---------------------------------------------------------------------------------------------------------\n");
 }
 
 void Search_Record()
@@ -148,18 +155,18 @@ void Search_Record()
     printf("\n\t\tEnter name to search for: ");
     scanf(" %[^\n]s", search_name);
     int found = 0;
-    printf("\n\t\t------------------- Search Results ------------------\n\n");
-    printf("%-20s %-20s %-20s\n", "Name", "Date of Death", "Voter ID Number");
-    printf("-------------------------------------------------------\n");
+    printf("\n\t\t----------------------------------- Search Results ----------------------------------------------\n\n");
+    printf("%-20s %-20s %-20s %-25s %-20s\n", "Name", "Date of Death", "Date of Birth", "Address", "Voter ID Number");
+    printf("--------------------------------------------------------------------------------------------------------\n");
     for (int i = 0; i < num_records; i++)
     {
         if (strcmp(D[i].Name, search_name) == 0)
         {
-            printf("%-20s %-20s %-20lf\n", D[i].Name, D[i].Date, D[i].voter_id);
+            printf("%-20s %-20s %-20s %-25s %-20lf\n", D[i].Name, D[i].Date, D[i].DOB, D[i].Address, D[i].voter_id);
             found = 1;
         }
     }
-    printf("-------------------------------------------------------\n");
+    printf("---------------------------------------------------------------------------------------------------\n");
     if (!found)
     {
         printf("\n\t\tNo records found.\n");
@@ -168,7 +175,7 @@ void Search_Record()
 
 void Add_Record()
 {
-    if (num_records == 100)
+    if (num_records == 1000)
     {
         printf("\n\t\tError: Maximum number of records reached.\n");
         return;
@@ -178,6 +185,10 @@ void Add_Record()
     scanf(" %[^\n]s", new_record.Name);
     printf("\t\tEnter date of death (DD/MM/YYYY): ");
     scanf(" %[^\n]s", new_record.Date);
+    printf("\t\tEnter date of birth (DD/MM/YYYY): ");
+    scanf(" %[^\n]s", new_record.DOB);
+    printf("\t\tEnter address: ");
+    scanf(" %[^\n]s", new_record.Address);
     printf("\t\tEnter Voter ID: ");
     scanf("%lf", &new_record.voter_id);
     D[num_records++] = new_record;
@@ -205,6 +216,10 @@ void Modify_Record()
             scanf(" %[^\n]s", D[i].Name);
             printf("\t\tEnter the new date of death (DD/MM/YYYY): ");
             scanf(" %[^\n]s", D[i].Date);
+            printf("\t\tEnter the new date of birth (DD/MM/YYYY): ");
+            scanf(" %[^\n]s", D[i].DOB);
+            printf("\t\tEnter the new address: ");
+            scanf(" %[^\n]s", D[i].Address);
             printf("\t\tEnter the new Voter ID: ");
             scanf("%lf", &D[i].voter_id);
             printf("\n\t\tRecord modified successfully.\n");
@@ -264,7 +279,7 @@ void Save_Records()
 
     for (int i = 0; i < num_records; i++)
     {
-        fprintf(file, "%s;%s;%lf\n", D[i].Name, D[i].Date, D[i].voter_id);
+        fprintf(file, "%s;%s;%s;%s;%lf\n", D[i].Name, D[i].Date, D[i].DOB, D[i].Address, D[i].voter_id);
     }
 
     fclose(file);
@@ -284,11 +299,10 @@ void Load_Records()
     char line[200];
     while (fgets(line, sizeof(line), file))
     {
-        sscanf(line, "%[^;];%[^;];%lf\n", D[num_records].Name, D[num_records].Date, &D[num_records].voter_id);
+        sscanf(line, "%[^;];%[^;];%[^;];%[^;];%lf\n", D[num_records].Name, D[num_records].Date, D[num_records].DOB, D[num_records].Address, &D[num_records].voter_id);
         num_records++;
     }
 
     fclose(file);
     printf("\n\t\tRecords loaded from file.\n");
 }
-
